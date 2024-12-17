@@ -4,15 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 // API URL
 var zenoURL string = "https://api.zeno.africa"
 
 // Pay makes payment request to the Zeno API
-func Pay(amount, name, phone, email string, callback func(orderID string, ok bool)) (orderID string, err error) {
+func Pay(amount float64, name, phone, email string, callback func(orderID string, ok bool)) (orderID string, err error) {
+	// convert amount to string
+	amountStr := strconv.FormatFloat(amount, 'f', -1, 64)
 	// construct data in buffer of url.Values
-	data := newData(amount, name, phone, email)
+	data := newData(amountStr, name, phone, email)
 
 	// prepare and make request
 	client := &http.Client{}

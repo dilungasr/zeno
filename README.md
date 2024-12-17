@@ -79,7 +79,7 @@ func main() {
     zeno.ConfigAPI("your-account-id", "your-api-key", "your-secret-key")
 
     // Create a payment order
-    orderID, err := zeno.Pay("1500", "John Doe", "0712345678", "john.doe@gmail.com", func(orderID string, success bool) {
+    orderID, err := zeno.Pay(1500, "John Doe", "0712345678", "john.doe@gmail.com", func(orderID string, success bool) {
         if success {
             fmt.Printf("Payment for Order %s was successful!\n", orderID)
         } else {
@@ -125,7 +125,7 @@ Creates a payment order.
 
 - **Parameters**:
 
-  - `amount`: Payment amount (string).
+  - `amount`: Payment amount (float64).
   - `name`: Buyer's name.
   - `phone`: Buyer's phone number.
   - `email`: Buyer's email.
@@ -185,7 +185,7 @@ This package is written by **Dilunga the Great** for the Golang community and is
 
 - **GitHub Repository**: [github.com/dilungasr/zeno](https://github.com/dilungasr/zeno)
 - **Zenopay Official Website**: [https://zenopay.net/](https://zenopay.net/)
-- **Contact Author**:
+- **Contact Author**:k
   - WhatsApp: +255785453830
   - Email: thegreatdilunga@gmail.com
 
