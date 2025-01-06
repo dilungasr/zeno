@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strconv"
 )
 
@@ -14,6 +15,17 @@ var zenoURL string = "https://api.zeno.africa"
 func Pay(amount float64, name, phone, email string, callback func(orderID string, ok bool)) (orderID string, err error) {
 	// convert amount to string
 	amountStr := strconv.FormatFloat(amount, 'f', -1, 64)
+	// Validate email address
+	match, _ := regexp.MatchString("(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$)", email)
+	if !match {
+
+		return "", fmt.Errorf("Invalid Email provided.")
+	}
+	// Validate phone number
+	match, _ = regexp.MatchString("^(\\+?(255))?\\d{9,10}$", phone)
+	if !match {
+		return "", fmt.Errorf("Invalid Phone number provided.")
+	}
 	// construct data in buffer of url.Values
 	data := newData(amountStr, name, phone, email)
 
