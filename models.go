@@ -3,6 +3,7 @@ package zeno
 import (
 	"bytes"
 	"net/url"
+	"strings"
 )
 
 // newData constructs and returns zenno.Data
@@ -15,6 +16,7 @@ func newData(amount string, name, phone, email string) *bytes.Buffer {
 
 	// construct and return data
 	values := url.Values{}
+	phone = strings.Replace(phone, "+", "", 1)
 
 	values.Set("create_order", "1")
 	values.Set("buyer_name", name)
