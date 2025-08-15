@@ -3,6 +3,7 @@ package zeno
 import (
 	"bytes"
 	"net/url"
+	"time"
 )
 
 // newData constructs and returns zenno.Data
@@ -43,4 +44,5 @@ type apiConfig struct {
 	AccountID  string
 	SecreteKey string
 	APIKey     string
+	Timeout    time.Duration
 }

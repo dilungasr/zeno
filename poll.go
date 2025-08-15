@@ -12,7 +12,7 @@ import (
 // pollPaymentStatus periodically checks the status of the order payment every 5 seconds for 50 seconds max
 func pollPaymentStatus(orderID string, callback func(orderID string, ok bool)) {
 	ticker := time.NewTicker(5 * time.Second)
-	timeout := time.After(50 * time.Second)
+	timeout := time.After(apiConfigData.Timeout)
 
 	// loop the channels
 	for {
