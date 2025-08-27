@@ -3,6 +3,7 @@ module github.com/dilungasr/zeno
 go 1.23.0
 
 require (
+	github.com/dilungasr/tanzanite v1.0.218
 	github.com/gin-gonic/gin v1.10.1
 	github.com/gofiber/fiber/v2 v2.52.9
 	github.com/gorilla/mux v1.8.1
