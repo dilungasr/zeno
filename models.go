@@ -2,47 +2,52 @@ package zeno
 
 import (
 	"bytes"
-	"net/url"
+	"encoding/json"
 	"time"
 )
 
 // newData constructs and returns zenno.Data
-func newData(amount string, name, phone, email string) *bytes.Buffer {
-
-	// get API access data
-	accountID := apiConfigData.AccountID
-	APIKey := apiConfigData.APIKey
-	secreteKey := apiConfigData.SecreteKey
+func newData(orderID string, amount float64, name, phone, email string) (data *bytes.Buffer) {
 
 	// construct and return data
-	values := url.Values{}
+	orderData := map[string]any{
+		"order_id":    orderID,
+		"buyer_email": email,
+		"buyer_name":  name,
+		"buyer_phone": phone,
+		"amount":      amount,
+		"webhook_url": apiConfigOptions.CallbackURL,
+	}
 
-	values.Set("create_order", "1")
-	values.Set("buyer_name", name)
-	values.Set("buyer_phone", phone)
-	values.Set("buyer_email", email)
-	values.Set("amount", amount)
-	values.Set("account_id", accountID)
-	values.Set("secrete_key", secreteKey)
-	values.Set("api_key", APIKey)
+	// convert data to json
+	jsonData, err := json.Marshal(orderData)
+	if err != nil {
+		zLog(err.Error())
+		return data
+	}
 
-	data := values.Encode()
-
-	return bytes.NewBufferString(data)
+	return bytes.NewBuffer(jsonData)
 }
 
 // zenoRes holds data about status json data returned by the Zeno API
 type zenoRes struct {
-	Status        string `json:"status"`
-	PaymentStatus string `json:"payment_status"`
-	Message       string `json:"message"`
-	OrderID       string `json:"order_id"`
+	Status     string `json:"status"`
+	ResultCode string `json:"resultcode"`
+	Message    string `json:"message"`
+	OrderID    string `json:"order_id"`
 }
 
-// Holds API access data for the ZenoAPI
-type apiConfig struct {
-	AccountID  string
-	SecreteKey string
-	APIKey     string
-	Timeout    time.Duration
+// Holds API key for the ZenoAPI, timeout and the callback endpoint
+type Options struct {
+	APIKey      string
+	CallbackURL string
+	Timeout     time.Duration
+}
+
+// HookData holds data passed to the hook request
+type HookData struct {
+	OrderID       string `json:"order_id"`
+	PaymentStatus string `json:"payment_status"`
+	Reference     string `json:"reference"`
+	MetaData      any    `json:"metadata"`
 }

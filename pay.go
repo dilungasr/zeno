@@ -2,37 +2,39 @@ package zeno
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
-	"strconv"
 )
 
 // API URL
-var zenoURL string = "https://api.zeno.africa"
+const (
+	zenoURL        string = "https://zenoapi.com/api/payments"
+	mobileMoneyURL string = zenoURL + "/mobile_money_tanzania"
+)
 
 // Pay makes payment request to the Zeno API
-func Pay(amount float64, name, phone, email string, callback func(orderID string, ok bool)) (orderID string, err error) {
-	// convert amount to string
-	amountStr := strconv.FormatFloat(amount, 'f', -1, 64)
+func Pay(orderID string, amount float64, name, phone, email string, timeoutFn func(orderID string)) (err error) {
+
 	// construct data in buffer of url.Values
-	data := newData(amountStr, name, phone, email)
+	data := newData(orderID, amount, name, phone, email)
 
 	// prepare and make request
 	client := &http.Client{}
 
-	req, err := http.NewRequest(http.MethodPost, zenoURL, data)
+	req, err := http.NewRequest(http.MethodPost, mobileMoneyURL, data)
 	if err != nil {
 		msg := zLog(err.Error())
-		return orderID, fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 
-	// add required headers
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	// add format and api key
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("x-api-key", apiConfigOptions.APIKey)
 
 	res, err := client.Do(req)
 	if err != nil {
 		msg := zLog(err.Error())
-		return orderID, fmt.Errorf(msg)
+		return errors.New(msg)
 
 	}
 
@@ -43,7 +45,7 @@ func Pay(amount float64, name, phone, email string, callback func(orderID string
 	// check status code
 	if res.StatusCode != http.StatusOK {
 		msg := zLog("Unexpected status code %v", res.StatusCode)
-		return orderID, fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 
 	//  decode json data
@@ -52,18 +54,20 @@ func Pay(amount float64, name, phone, email string, callback func(orderID string
 	err = json.NewDecoder(res.Body).Decode(&zRes)
 	if err != nil {
 		msg := zLog(err.Error())
-		return orderID, fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 
 	if zRes.Status != "success" {
 		msg := zLog(zRes.Message)
-		return orderID, fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 
-	// start background polling
-	go pollPaymentStatus(zRes.OrderID, callback)
+	// monitor timeout
+	if timeoutFn != nil {
+		go timeoutStatus(orderID, timeoutFn)
+	}
 
 	zLog("Payment for order %v initiated...", zRes.OrderID)
 
-	return zRes.OrderID, nil
+	return nil
 }
