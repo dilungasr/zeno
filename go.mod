@@ -1,4 +1,4 @@
-module github.com/dilungasr/zeno
+module github.com/dilungasr/zeno/v2
 
 go 1.23.0
 
