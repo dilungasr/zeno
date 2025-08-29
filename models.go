@@ -7,15 +7,16 @@ import (
 )
 
 // newData constructs and returns zenno.Data
-func newData(orderID string, amount float64, name, phone, email string) (data *bytes.Buffer) {
+func newData(paymentData PaymentData) (data *bytes.Buffer) {
 
 	// construct and return data
 	orderData := map[string]any{
-		"order_id":    orderID,
-		"buyer_email": email,
-		"buyer_name":  name,
-		"buyer_phone": phone,
-		"amount":      amount,
+		"order_id":    paymentData.OrderID,
+		"buyer_email": paymentData.Email,
+		"buyer_name":  paymentData.Name,
+		"buyer_phone": paymentData.Phone,
+		"amount":      paymentData.Amount,
+		"metadata":    paymentData.MetaData,
 		"webhook_url": apiConfigOptions.CallbackURL,
 	}
 
@@ -50,4 +51,14 @@ type HookData struct {
 	PaymentStatus string `json:"payment_status"`
 	Reference     string `json:"reference"`
 	MetaData      any    `json:"metadata"`
+}
+
+// PaymentData holds data passed to the payment request
+type PaymentData struct {
+	OrderID  string
+	Amount   float64
+	Name     string
+	Phone    string
+	Email    string
+	MetaData any
 }

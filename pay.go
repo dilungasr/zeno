@@ -13,10 +13,10 @@ const (
 )
 
 // Pay makes payment request to the Zeno API
-func Pay(orderID string, amount float64, name, phone, email string, timeoutFn func(orderID string)) (err error) {
+func Pay(paymentData PaymentData, timeoutFn func(orderID string)) (err error) {
 
 	// construct data in buffer of url.Values
-	data := newData(orderID, amount, name, phone, email)
+	data := newData(paymentData)
 
 	// prepare and make request
 	client := &http.Client{}
@@ -64,7 +64,7 @@ func Pay(orderID string, amount float64, name, phone, email string, timeoutFn fu
 
 	// monitor timeout
 	if timeoutFn != nil {
-		go timeoutStatus(orderID, timeoutFn)
+		go timeoutStatus(paymentData.OrderID, timeoutFn)
 	}
 
 	zLog("Payment for order %v initiated...", zRes.OrderID)
