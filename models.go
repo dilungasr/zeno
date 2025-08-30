@@ -3,7 +3,6 @@ package zeno
 import (
 	"bytes"
 	"encoding/json"
-	"log"
 	"time"
 )
 
@@ -20,8 +19,6 @@ func newData(paymentData PaymentData) (data *bytes.Buffer) {
 		"metadata":    paymentData.MetaData,
 		"webhook_url": apiConfigOptions.CallbackURL,
 	}
-
-	log.Printf("orderData: %v\n", orderData)
 
 	// convert data to json
 	jsonData, err := json.Marshal(orderData)

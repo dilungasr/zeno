@@ -15,7 +15,6 @@ func timeoutStatus(orderID string, timeoutFn func(orderID string)) {
 
 	// wait for timeout
 	<-timeoutTimer.C
-	zLog("Payment for order %v has timed out", orderID)
 	// call timeout function callback
 	timeoutFn(orderID)
 }
